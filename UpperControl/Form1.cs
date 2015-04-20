@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -21,10 +22,14 @@ namespace UpperControl
         private List<byte> buffer = new List<byte>(4096);       //默认分配1页内存，并始终限制不允许超过
         private byte[] catchedBinaryData = new byte[10];         //缓存的10字节数据
         private short[] receivedData = new short[4];
+        private const int timerInterval = 5;
+        private System.Timers.Timer hypocrisyTimer = new System.Timers.Timer(timerInterval);
+        private UInt64 timeCount = 0;
 
         public hypocrisyForm()
         {
             InitializeComponent();
+            //Control.CheckForIllegalCrossThreadCalls = false;
         }
 
         private void hypocrisyForm_Load(object sender, EventArgs e)
@@ -60,6 +65,31 @@ namespace UpperControl
             hypocrisyGetData.Add(hypocrisyCheckBox7, hypocrisyTextBox7);
             hypocrisyGetData.Add(hypocrisyCheckBox8, hypocrisyTextBox8);
             hypocrisyGetData.Add(hypocrisyCheckBox9, hypocrisyTextBox9);
+
+            //添加定时器处理
+            hypocrisyTimer.Elapsed += new System.Timers.ElapsedEventHandler(timerDispose);
+            hypocrisyTimer.AutoReset = true;
+            hypocrisyTimer.Enabled = false;
+            //添加Chart画图初始化
+            //hypocrisyScope.ChartAreas[0].BackColor = Color.Black;
+            hypocrisyScope.ChartAreas[0].CursorX.IsUserEnabled = true;
+            hypocrisyScope.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
+            hypocrisyScope.ChartAreas[0].CursorX.AutoScroll = true;
+            //hypocrisyScope.ChartAreas[0].CursorX.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Seconds;
+            hypocrisyScope.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+            hypocrisyScope.ChartAreas[0].AxisX.ScaleView.Size = 100;
+            //hypocrisyScope.ChartAreas[0].AxisX.ScaleView.SmallScrollSize = double.NaN;
+            //hypocrisyScope.ChartAreas[0].AxisX.ScaleView.SmallScrollMinSize = 20;
+            hypocrisyScope.ChartAreas[0].AxisX.ScrollBar.IsPositionedInside = true;
+            hypocrisyScope.ChartAreas[0].AxisX.ScrollBar.ButtonColor = Color.Green;
+            hypocrisyScope.ChartAreas[0].AxisX.ScrollBar.BackColor = Color.Cyan;
+            hypocrisyScope.ChartAreas[0].AxisX.ScrollBar.ButtonStyle = System.Windows.Forms.DataVisualization.Charting.ScrollBarButtonStyles.SmallScroll;
+            hypocrisyScope.ChartAreas[0].AxisX.ScrollBar.Size = 6;
+            hypocrisyScope.ChartAreas[0].AxisX.ScrollBar.Enabled = true;            
+            hypocrisyScope.ChartAreas[0].AxisX.Interval = 10;
+            //hypocrisyScope.ChartAreas[0].AxisX.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Seconds;
+            //hypocrisyScope.ChartAreas[0].AxisX.IsLabelAutoFit = false;
+            this.hypocrisyScope.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
         }
 
         void hypocrisyDataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -118,7 +148,12 @@ namespace UpperControl
             }
             else
             {
-                buffer.CopyTo(0, catchedBinaryData, 0, 8);
+                while (buffer.Count >= 8)
+                {
+                    buffer.CopyTo(0, catchedBinaryData, 0, 8);
+                    dataCatched = true;
+                    buffer.RemoveRange(0, 8);
+                }
             }
 
             if (dataCatched)
@@ -313,6 +348,44 @@ namespace UpperControl
             foreach (TextBox textBox in hypocrisyGetData.Values)
             {
                 textBox.Text = null;
+            }
+        }
+
+        private void timerDispose(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            double xVlaue = Convert.ToDouble(timeCount);
+            //double yValue = Math.Exp(Math.Sin(xVlaue));
+            double yValue = receivedData[0];
+
+            this.Invoke((EventHandler)(delegate
+            {
+                this.hypocrisyScope.Series[0].Points.AddXY(xVlaue, yValue);
+                hypocrisyScope.ChartAreas[0].AxisX.ScaleView.Scroll(DateTime.Now);  //实时滚动
+            }));
+
+            timeCount += timerInterval;
+        }
+
+        private void hypocrisyButtonScope_Click(object sender, EventArgs e)
+        {
+            if(hypocrisyButtonScope.Text == "View Scope")
+            {
+                hypocrisyButtonScope.Text = "Stop View";
+                hypocrisyTimer.Enabled = true;
+            }
+            else
+            {
+                hypocrisyButtonScope.Text = "View Scope";
+                hypocrisyTimer.Enabled = false;
+            }
+        }
+
+        private void hypocrisyScopeClear_Click(object sender, EventArgs e)
+        {
+            double[] xClear = {}, yClear = {};
+            for (int iCount = 0; iCount < hypocrisyScope.Series.Count; iCount++)
+            {
+                hypocrisyScope.Series[iCount].Points.DataBindXY(xClear, yClear);
             }
         }
     }

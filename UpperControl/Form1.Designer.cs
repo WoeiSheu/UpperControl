@@ -28,6 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.hypocrisyComboBox1 = new System.Windows.Forms.ComboBox();
             this.hypocrisyComboBox2 = new System.Windows.Forms.ComboBox();
             this.hypocrisyButton1 = new System.Windows.Forms.Button();
@@ -72,11 +75,12 @@
             this.checkSumToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cRCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.hypocrisyScope = new System.Windows.Forms.PictureBox();
             this.hypocrisyHead = new System.Windows.Forms.PictureBox();
+            this.hypocrisyScope = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.hypocrisyScopeClear = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.hypocrisyScope)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.hypocrisyHead)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.hypocrisyScope)).BeginInit();
             this.SuspendLayout();
             // 
             // hypocrisyComboBox1
@@ -517,12 +521,13 @@
             this.hypocrisyButtonScope.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
             this.hypocrisyButtonScope.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.hypocrisyButtonScope.ForeColor = System.Drawing.Color.LightSeaGreen;
-            this.hypocrisyButtonScope.Location = new System.Drawing.Point(392, 568);
+            this.hypocrisyButtonScope.Location = new System.Drawing.Point(333, 569);
             this.hypocrisyButtonScope.Name = "hypocrisyButtonScope";
             this.hypocrisyButtonScope.Size = new System.Drawing.Size(97, 23);
             this.hypocrisyButtonScope.TabIndex = 39;
             this.hypocrisyButtonScope.Text = "View Scope";
             this.hypocrisyButtonScope.UseVisualStyleBackColor = false;
+            this.hypocrisyButtonScope.Click += new System.EventHandler(this.hypocrisyButtonScope_Click);
             // 
             // menuStrip1
             // 
@@ -547,7 +552,7 @@
             // preferencesToolStripMenuItem
             // 
             this.preferencesToolStripMenuItem.Name = "preferencesToolStripMenuItem";
-            this.preferencesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.preferencesToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
             this.preferencesToolStripMenuItem.Text = "Preferences";
             // 
             // protocolToolStripMenuItem
@@ -556,20 +561,20 @@
             this.checkSumToolStripMenuItem,
             this.cRCToolStripMenuItem});
             this.protocolToolStripMenuItem.Name = "protocolToolStripMenuItem";
-            this.protocolToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.protocolToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
             this.protocolToolStripMenuItem.Text = "Protocol";
             // 
             // checkSumToolStripMenuItem
             // 
             this.checkSumToolStripMenuItem.Name = "checkSumToolStripMenuItem";
-            this.checkSumToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.checkSumToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.checkSumToolStripMenuItem.Text = "CheckSum";
             this.checkSumToolStripMenuItem.Click += new System.EventHandler(this.checkSumToolStripMenuItem_Click);
             // 
             // cRCToolStripMenuItem
             // 
             this.cRCToolStripMenuItem.Name = "cRCToolStripMenuItem";
-            this.cRCToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.cRCToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.cRCToolStripMenuItem.Text = "CRC";
             this.cRCToolStripMenuItem.Click += new System.EventHandler(this.cRCToolStripMenuItem_Click);
             // 
@@ -580,18 +585,6 @@
             this.setupToolStripMenuItem.Text = "Setup";
             this.setupToolStripMenuItem.Click += new System.EventHandler(this.setupToolStripMenuItem_Click);
             // 
-            // hypocrisyScope
-            // 
-            this.hypocrisyScope.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.hypocrisyScope.BackColor = System.Drawing.Color.Black;
-            this.hypocrisyScope.Location = new System.Drawing.Point(222, 259);
-            this.hypocrisyScope.Name = "hypocrisyScope";
-            this.hypocrisyScope.Size = new System.Drawing.Size(476, 303);
-            this.hypocrisyScope.TabIndex = 33;
-            this.hypocrisyScope.TabStop = false;
-            // 
             // hypocrisyHead
             // 
             this.hypocrisyHead.Image = global::UpperControl.Properties.Resources.head;
@@ -601,17 +594,50 @@
             this.hypocrisyHead.TabIndex = 0;
             this.hypocrisyHead.TabStop = false;
             // 
+            // hypocrisyScope
+            // 
+            this.hypocrisyScope.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            chartArea1.Name = "ChartArea1";
+            this.hypocrisyScope.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.hypocrisyScope.Legends.Add(legend1);
+            this.hypocrisyScope.Location = new System.Drawing.Point(222, 246);
+            this.hypocrisyScope.Name = "hypocrisyScope";
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.hypocrisyScope.Series.Add(series1);
+            this.hypocrisyScope.Size = new System.Drawing.Size(476, 316);
+            this.hypocrisyScope.TabIndex = 41;
+            this.hypocrisyScope.Text = "Scope";
+            // 
+            // hypocrisyScopeClear
+            // 
+            this.hypocrisyScopeClear.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.hypocrisyScopeClear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
+            this.hypocrisyScopeClear.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.hypocrisyScopeClear.Location = new System.Drawing.Point(455, 569);
+            this.hypocrisyScopeClear.Name = "hypocrisyScopeClear";
+            this.hypocrisyScopeClear.Size = new System.Drawing.Size(75, 23);
+            this.hypocrisyScopeClear.TabIndex = 42;
+            this.hypocrisyScopeClear.Text = "Clear";
+            this.hypocrisyScopeClear.UseVisualStyleBackColor = false;
+            this.hypocrisyScopeClear.Click += new System.EventHandler(this.hypocrisyScopeClear_Click);
+            // 
             // hypocrisyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(732, 598);
+            this.Controls.Add(this.hypocrisyScopeClear);
+            this.Controls.Add(this.hypocrisyScope);
             this.Controls.Add(this.hypocrisyButtonScope);
             this.Controls.Add(this.hypocrisyClear);
             this.Controls.Add(this.hypocrisySend);
             this.Controls.Add(this.hypocrisyReset);
             this.Controls.Add(this.hypocrisyCheckHex);
-            this.Controls.Add(this.hypocrisyScope);
             this.Controls.Add(this.hypocrisyLinkLabel4);
             this.Controls.Add(this.hypocrisyLinkLabel3);
             this.Controls.Add(this.hypocrisyLinkLabel2);
@@ -652,8 +678,8 @@
             this.Load += new System.EventHandler(this.hypocrisyForm_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.hypocrisyScope)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.hypocrisyHead)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.hypocrisyScope)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -694,7 +720,6 @@
         private System.Windows.Forms.LinkLabel hypocrisyLinkLabel2;
         private System.Windows.Forms.LinkLabel hypocrisyLinkLabel3;
         private System.Windows.Forms.LinkLabel hypocrisyLinkLabel4;
-        private System.Windows.Forms.PictureBox hypocrisyScope;
         private System.Windows.Forms.CheckBox hypocrisyCheckHex;
         private System.Windows.Forms.Button hypocrisyReset;
         private System.Windows.Forms.Button hypocrisySend;
@@ -707,6 +732,8 @@
         private System.Windows.Forms.ToolStripMenuItem checkSumToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cRCToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setupToolStripMenuItem;
+        private System.Windows.Forms.DataVisualization.Charting.Chart hypocrisyScope;
+        private System.Windows.Forms.Button hypocrisyScopeClear;
     }
 }
 
