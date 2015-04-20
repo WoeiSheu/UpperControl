@@ -506,9 +506,10 @@
             // 
             // hypocrisyClear
             // 
+            this.hypocrisyClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.hypocrisyClear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
             this.hypocrisyClear.ForeColor = System.Drawing.Color.Green;
-            this.hypocrisyClear.Location = new System.Drawing.Point(66, 439);
+            this.hypocrisyClear.Location = new System.Drawing.Point(66, 430);
             this.hypocrisyClear.Name = "hypocrisyClear";
             this.hypocrisyClear.Size = new System.Drawing.Size(75, 23);
             this.hypocrisyClear.TabIndex = 38;

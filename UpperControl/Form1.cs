@@ -118,6 +118,7 @@ namespace UpperControl
                         }
                     }
                     buffer.CopyTo(0, catchedBinaryData, 0, 10);
+                    //catchedBinaryData.Reverse();
                     if (CRCResult != BitConverter.ToUInt16(catchedBinaryData, 8))
                     {
                         buffer.RemoveRange(0, 10);
@@ -353,8 +354,9 @@ namespace UpperControl
 
         private void timerDispose(Object source, System.Timers.ElapsedEventArgs e)
         {
+            //int frequencyDivision = 10;
             double xVlaue = Convert.ToDouble(timeCount);
-            //double yValue = Math.Exp(Math.Sin(xVlaue));
+            //double yValue = Math.Sqrt(100-xVlaue*2);
             double yValue = receivedData[0];
 
             this.Invoke((EventHandler)(delegate
