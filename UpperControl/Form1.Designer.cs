@@ -614,6 +614,7 @@
             this.hypocrisyScope.Size = new System.Drawing.Size(476, 316);
             this.hypocrisyScope.TabIndex = 41;
             this.hypocrisyScope.Text = "Scope";
+            this.hypocrisyScope.MouseClick += new System.Windows.Forms.MouseEventHandler(this.hypocrisyScope_MouseClick);
             // 
             // hypocrisyScopeClear
             // 

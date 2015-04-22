@@ -25,7 +25,7 @@ namespace UpperControl
         private const int timerInterval = 5;
         private System.Timers.Timer hypocrisyTimer = new System.Timers.Timer(timerInterval);
         private UInt64 timeCount = 0;
-
+        
         public hypocrisyForm()
         {
             InitializeComponent();
@@ -89,7 +89,6 @@ namespace UpperControl
             hypocrisyScope.ChartAreas[0].AxisX.Interval = 10;
             //hypocrisyScope.ChartAreas[0].AxisX.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Seconds;
             //hypocrisyScope.ChartAreas[0].AxisX.IsLabelAutoFit = false;
-            this.hypocrisyScope.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
         }
 
         void hypocrisyDataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -166,29 +165,6 @@ namespace UpperControl
             }
 
             builder.Clear();//清除字符串构造器的内容
-
-            //因为要访问ui资源,所以需要使用invoke方式同步ui
-            this.Invoke((EventHandler)(delegate
-            {
-                int iCount = 0;
-                //在文本框显示接收的各个数据
-                foreach (KeyValuePair<CheckBox, TextBox> getDataCollection in hypocrisyGetData)
-                {
-                    if (getDataCollection.Key.Checked)
-                    {
-                        if (iCount < 4)
-                        {
-                            getDataCollection.Value.Text = receivedData[iCount].ToString();
-                        }
-                        iCount++;
-                    }
-                    if (iCount > 4)
-                    {
-                        MessageBox.Show("Now, you can only check 4 variables.");
-                        break;
-                    }
-                }
-            }));
         }
 
         private void hypocrisyButton1_Click(object sender, EventArgs e)
@@ -288,6 +264,7 @@ namespace UpperControl
                     try
                     {
                         byte[] tempData = BitConverter.GetBytes(Int16.Parse(hypocrisySendString[sendCount]));
+                        //tempData.Reverse();
                         if (hypocrisySerialPort.IsOpen)
                         {
                             hypocrisySerialPort.Write(tempData, 0, 2);
@@ -295,10 +272,7 @@ namespace UpperControl
                     }
                     catch
                     {
-                        if (hypocrisySerialPort.IsOpen)
-                        {
-                            hypocrisySerialPort.Write(hypocrisySendString[sendCount]);
-                        }
+                        MessageBox.Show("You can only send numbers");
                     }
                 }
             }
@@ -359,17 +333,67 @@ namespace UpperControl
             //double yValue = Math.Sqrt(100-xVlaue*2);
             double yValue = receivedData[0];
 
+            //因为要访问ui资源,所以需要使用invoke方式同步ui
             this.Invoke((EventHandler)(delegate
             {
-                this.hypocrisyScope.Series[0].Points.AddXY(xVlaue, yValue);
-                hypocrisyScope.ChartAreas[0].AxisX.ScaleView.Scroll(DateTime.Now);  //实时滚动
+                int iCount = 0;
+                //在文本框显示接收的各个数据
+                foreach (KeyValuePair<CheckBox, TextBox> getDataCollection in hypocrisyGetData)
+                {
+                    if (getDataCollection.Key.Checked)
+                    {
+                        if (iCount < 4)
+                        {
+                            yValue = receivedData[iCount];
+                            getDataCollection.Value.Text = yValue.ToString();
+                            this.hypocrisyScope.Series[iCount].Points.AddXY(xVlaue, yValue);
+                        }
+                        iCount++;
+                    }
+                    if (iCount > 4)
+                    {
+                        MessageBox.Show("Now, you can only check 4 variables.");
+                        break;
+                    }
+                    hypocrisyScope.ChartAreas[0].AxisX.ScaleView.Scroll(DateTime.Now);  //实时滚动
+                }
             }));
 
             timeCount += timerInterval;
         }
+        //点击Chart上Series任一Series后可以在TextBox上显示所有Series的Y值
+        private void hypocrisyScope_MouseClick(object sender, MouseEventArgs e)
+        {
+            int kCount = 0;
+            System.Windows.Forms.DataVisualization.Charting.HitTestResult hitTestResult = new System.Windows.Forms.DataVisualization.Charting.HitTestResult();
+            if (hypocrisyButtonScope.Text == "View Scope")
+            {
+                if (e.Button == System.Windows.Forms.MouseButtons.Left)
+                {
+                    hitTestResult = hypocrisyScope.HitTest(e.X, e.Y);
+                }
+            }
+
+            //kCount = hypocrisyScope.Series.IndexOf(hitTestResult.Series);
+            if (hitTestResult.Series != null)
+            {
+                foreach (KeyValuePair<CheckBox, TextBox> getDataCollection in hypocrisyGetData)
+                {
+                    if (getDataCollection.Key.Checked)
+                    {
+                        getDataCollection.Value.Text = hypocrisyScope.Series[kCount].Points[hitTestResult.PointIndex].YValues[0].ToString();
+                        kCount = (kCount >= 3 ? 0 : ++kCount);
+                    }
+                }
+            }
+        }
 
         private void hypocrisyButtonScope_Click(object sender, EventArgs e)
         {
+            if (timeCount == 0)
+            {
+                hypocrisyChangeChartDisplay();
+            }
             if(hypocrisyButtonScope.Text == "View Scope")
             {
                 hypocrisyButtonScope.Text = "Stop View";
@@ -389,6 +413,33 @@ namespace UpperControl
             {
                 hypocrisyScope.Series[iCount].Points.DataBindXY(xClear, yClear);
             }
+        }
+
+        private void hypocrisyChangeChartDisplay()
+        {
+            this.hypocrisyScope.Series.Clear();
+            this.Invoke((EventHandler)(delegate
+            {
+                int iCount = 0;
+                //修改Chart图标文字,添加Series
+                foreach (KeyValuePair<CheckBox, TextBox> getDataCollection in hypocrisyGetData)
+                {
+                    if (getDataCollection.Key.Checked)
+                    {
+                        if (iCount < 4)
+                        {
+                            this.hypocrisyScope.Series.Add(getDataCollection.Key.Text);
+                            this.hypocrisyScope.Series[iCount].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                        }
+                        iCount++;
+                    }
+                    if (iCount > 4)
+                    {
+                        MessageBox.Show("Now, you can only check 4 variables.");
+                        break;
+                    }
+                }
+            }));
         }
     }
 }
